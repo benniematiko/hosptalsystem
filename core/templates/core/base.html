@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Hospital System{% endblock %}</title>
+    <style>
+        :root {
+            --primary: #0b6e8a;
+            --dark: #0d2b36;
+            --light: #f4f7f9;
+            --text: #1d2b33;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: var(--light); color: var(--text); }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0; width: 240px;
+            background: var(--dark); color: #fff; padding: 20px 0;
+            transition: transform 0.2s;
+        }
+        .sidebar h2 { padding: 0 20px 20px; font-size: 18px; }
+        .sidebar a {
+            display: block; padding: 12px 20px; color: #cfe3ea; text-decoration: none;
+        }
+        .sidebar a:hover, .sidebar a.active { background: var(--primary); color: #fff; }
+
+        .main { margin-left: 240px; }
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fff; padding: 12px 24px; border-bottom: 1px solid #dde4e8;
+        }
+        .topbar button {
+            background: var(--primary); color: #fff; border: 0;
+            padding: 8px 14px; border-radius: 4px; cursor: pointer;
+        }
+        .menu-btn { display: none; background: var(--dark) !important; }
+        .content { padding: 24px; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); z-index: 10; }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .menu-btn { display: inline-block; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="sidebar" id="sidebar">
+        <h2>Hospital System</h2>
+        {% block sidebar %}
+        <a href="{% url 'dashboard' %}" class="active">Dashboard</a>
+        {% endblock %}
+    </nav>
+
+    <div class="main">
+        <header class="topbar">
+            <button class="menu-btn" id="menuBtn" type="button">Menu</button>
+            <span>
+                {{ request.user.get_full_name|default:request.user.username }}
+                ({{ request.user.get_role_display }})
+            </span>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Log out</button>
+            </form>
+        </header>
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        document.getElementById("menuBtn").addEventListener("click", function () {
+            document.getElementById("sidebar").classList.toggle("open");
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
